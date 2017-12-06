@@ -1,5 +1,9 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import spider
 from concurrent.futures import ThreadPoolExecutor
+
 
 def main():
     url_tree = {}
@@ -11,10 +15,10 @@ def main():
         if depth == 0:
             new_task = url_pool.copy()
         else:
-            new_task = url_tree[depth-1].copy()
-        with ThreadPoolExecutor(3) as executor:
+            new_task = url_tree[depth - 1].copy()
+        with ThreadPoolExecutor(10) as executor:
             for each in new_task:
-                new_link=executor.submit(spider.get_link,each,url_pool)
+                new_link = executor.submit(spider.get_link, each, url_pool, depth + 1)
                 url_tree[depth].extend(new_link.result())
                 url_pool.extend(new_link.result())
         # for each in new_task:
@@ -27,7 +31,6 @@ def main():
         print(url_tree[depth])
         # for each in url_tree[depth]:
         #     print(each)
-
 
 
 if __name__ == '__main__':

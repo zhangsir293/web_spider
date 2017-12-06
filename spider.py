@@ -1,21 +1,31 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import requests
 import re
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
+import save
 
 
-def get_link(url,url_pool):
-    new_link = []
+def get_page(url, depth):
     try:
         page = requests.get(url)
     except Exception as reason:
-        print("url 打开错误："+str(reason))
-    if not page:
-        return []
-    page_content = page.content
-    coding = page.encoding
-    if not coding:
+        print("url 打开错误：" + str(reason))
+    if page:
+        save.save(depth, url, page.content)
+        coding = page.encoding
+        if coding:
+            return page.content
+
+
+def get_link(url, url_pool, depth):
+    new_link = []
+    page_content = get_page(url, depth)
+
+    if page_content == None:
         return []
     """
     解析页面
@@ -67,12 +77,11 @@ def get_link(url,url_pool):
 
             if href_url not in new_link and href_url not in url_pool:
                 new_link.append(href_url)
-
     # print("current url: "+url)
     # print(new_link)
     return new_link
 
 
 if __name__ == '__main__':
-    get_link("http://www.scu.edu.cn/portal2013/inc/appvar.js")
-
+    result = get_link("http://www.scu.edu.cn", [], 1)
+    print(result)
