@@ -25,12 +25,18 @@ def save(depth, url, page_content):
     no_save = ["doc", "docx", "ppt", "pptx", "pdf", "DOC", "DOCX", "PPT", "PPTX", "PDF"]
     if save_dir1 not in no_save:
         save_dir = os.path.join(cur_path, depth, save_dir0, save_dir1)
+        try:
+            os.makedirs(save_dir,exist_ok=False)
+        except OSError:
+            pass
         if os.path.isdir(save_dir):
             save_path = os.path.join(save_dir, save_file)
             with open(save_path, "wb") as save_page:
                 save_page.write(page_content)
         else:
-            os.makedirs(save_dir, exist_ok=True)
+            print("文件夹已创建，但文件无法保存.")
+            raise Exception
+
     page_num += 1
 
 
