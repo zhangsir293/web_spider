@@ -10,8 +10,13 @@ import save
 
 
 def get_page(url, depth):
+    url_parse=urlparse(url)
+    Default_Header = {'X-Requested-With': 'XMLHttpRequest',
+                      'Referer': url_parse.scheme + '://' + url_parse.netloc,
+                      'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.87 Safari/537.36',
+                      'Host': url_parse.netloc}
     try:
-        page = requests.get(url, verify=True)
+        page = requests.get(url, headers=Default_Header, verify=True)
     except Exception as reason:
         print("url 打开错误：" + str(reason))
     if page:
