@@ -11,7 +11,7 @@ import save
 
 def get_page(url, depth):
     try:
-        page = requests.get(url)
+        page = requests.get(url, verify=True)
     except Exception as reason:
         print("url 打开错误：" + str(reason))
     if page:
@@ -23,6 +23,8 @@ def get_page(url, depth):
 
 def get_link(url, url_pool, depth):
     new_link = []
+    src_url = ""
+    href_url = ""
     page_content = get_page(url, depth)
 
     if page_content == None:
@@ -40,7 +42,7 @@ def get_link(url, url_pool, depth):
     """
     src_list = soup.find_all(src=re.compile(r"[^\s]+"))
     for src in src_list:
-        #print("src:  " + str(src))
+        # print("src:  " + str(src))
         src_str = re.search("src=(\"|\')?(?P<src>[^\"\']+)", str(src))
         if src_str:
             src_link = src_str.groupdict()["src"]
@@ -52,7 +54,7 @@ def get_link(url, url_pool, depth):
                 src_url = urlunparse(data)
             elif src_parse.netloc == url_parse.netloc:
                 src_url = src_link
-            if src_url not in new_link and src_url not in url_pool:
+            if src != "" and src_url not in new_link and src_url not in url_pool:
                 new_link.append(src_url)
 
     """
@@ -62,7 +64,7 @@ def get_link(url, url_pool, depth):
     for href in href_list:
         if re.search("(?<=base)[^>]+", str(href)):
             continue
-        #print("href: "+str(href))
+        # print("href: "+str(href))
         href_re = re.search("href=(\"|\')?(?P<href>[^\"\']+)", str(href))
         if href_re:
             href_link = href_str = href_re.groupdict()["href"]
@@ -75,7 +77,7 @@ def get_link(url, url_pool, depth):
             elif href_parse.netloc == url_parse.netloc:
                 href_url = href_link
 
-            if href_url not in new_link and href_url not in url_pool:
+            if href_url != "" and href_url not in new_link and href_url not in url_pool:
                 new_link.append(href_url)
     # print("current url: "+url)
     # print(new_link)
@@ -83,5 +85,5 @@ def get_link(url, url_pool, depth):
 
 
 if __name__ == '__main__':
-    result = get_link("http://www.scu.edu.cn", [], 1)
+    result = get_link("https://www.github.com", [], 1)
     print(result)
